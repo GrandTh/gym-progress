@@ -25,7 +25,7 @@ export default function LoginPage() {
   //   }
   // }, [])
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
     const supabase = createClient()
     setIsLoading(true)
@@ -53,7 +53,7 @@ export default function LoginPage() {
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Configuration Error</AlertTitle>
             <AlertDescription>
-              Supabase environment variables are missing. Please check your project settings or the "Vars" tab in the
+              Supabase environment variables are missing. Please check your project settings or the &quot;Vars&quot; tab in the
               sidebar.
             </AlertDescription>
           </Alert>
