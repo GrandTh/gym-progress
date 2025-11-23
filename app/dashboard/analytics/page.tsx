@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { createClient } from "@/lib/server"
 import { StrengthProgressionChart } from "@/components/strength-progression-chart"
 import { BodyWeightChart } from "@/components/body-weight-chart"

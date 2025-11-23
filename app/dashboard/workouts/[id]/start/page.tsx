@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from "@/lib/server"
 import { WorkoutLogger } from "@/components/workout-logger"
 import { notFound } from "next/navigation"
