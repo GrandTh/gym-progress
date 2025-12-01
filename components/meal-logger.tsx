@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, Search, Trash2 } from "lucide-react"
-import { createClient } from "@/lib/client"
+import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 
 type Food = {

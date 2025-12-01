@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/server"
+import { createClient } from "@/lib/supabase/server"
 import { ExerciseList } from "@/components/exercise-list"
 import { AddExerciseDialog } from "@/components/add-exercise-dialog"
 import { Input } from "@/components/ui/input"

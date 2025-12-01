@@ -2,19 +2,31 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Dumbbell, LayoutDashboard, Utensils, BarChart3, LogOut } from "lucide-react"
+import {
+  Dumbbell,
+  LayoutDashboard,
+  Utensils,
+  BarChart3,
+  LogOut,
+  User,
+  Users,
+  ShieldCheck,
+  UserPlus,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { createBrowserClient } from "@/lib/client"
+import { createBrowserClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { SettingsDialog } from "@/components/settings-dialog"
 import { useLanguage } from "@/lib/language-context"
+import { useUser } from "@/lib/user-context"
 
 export function AppSidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createBrowserClient()
   const { t } = useLanguage()
+  const { profile } = useUser()
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -22,7 +34,7 @@ export function AppSidebar() {
     router.refresh()
   }
 
-  const routes = [
+  const baseRoutes = [
     {
       label: t("dashboard"),
       icon: LayoutDashboard,
@@ -53,7 +65,45 @@ export function AppSidebar() {
       href: "/dashboard/analytics",
       active: pathname.startsWith("/dashboard/analytics"),
     },
+    {
+      label: t("profile"),
+      icon: User,
+      href: "/dashboard/profile",
+      active: pathname === "/dashboard/profile",
+    },
   ]
+
+  const coachRoutes =
+    profile?.role === "coach" || profile?.role === "admin"
+      ? [
+          {
+            label: t("members"),
+            icon: Users,
+            href: "/dashboard/coach/members",
+            active: pathname.startsWith("/dashboard/coach/members"),
+          },
+          {
+            label: t("groups"),
+            icon: UserPlus,
+            href: "/dashboard/coach/groups",
+            active: pathname.startsWith("/dashboard/coach/groups"),
+          },
+        ]
+      : []
+
+  const adminRoutes =
+    profile?.role === "admin"
+      ? [
+          {
+            label: t("adminDashboard"),
+            icon: ShieldCheck,
+            href: "/dashboard/admin",
+            active: pathname.startsWith("/dashboard/admin"),
+          },
+        ]
+      : []
+
+  const routes = [...baseRoutes, ...coachRoutes, ...adminRoutes]
 
   return (
     <div className="hidden border-r bg-muted/40 md:block w-64 fixed h-full">
@@ -64,7 +114,7 @@ export function AppSidebar() {
             <span className="">Gym Tracker</span>
           </Link>
         </div>
-        <div className="flex-1">
+        <div className="flex-1 overflow-y-auto">
           <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
             {routes.map((route) => (
               <Link

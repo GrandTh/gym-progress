@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/server"
+import { createClient } from "@/lib/supabase/server"
 import { RoutineForm } from "@/components/routine-form"
 
 export default async function NewRoutinePage() {

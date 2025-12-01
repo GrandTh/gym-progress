@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from "recharts"
 import { useEffect, useState } from "react"
-import { createClient } from "@/lib/client"
+import { createClient } from "@/lib/supabase/client"
 
 interface NutritionConsistencyChartProps {
   userId: string

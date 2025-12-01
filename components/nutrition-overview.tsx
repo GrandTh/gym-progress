@@ -70,6 +70,7 @@ export function NutritionOverview({ meals }: { meals: Meal[] }) {
           <Progress
             value={(totals.protein / targets.protein) * 100}
             className="mt-2 h-2 bg-secondary"
+            indicatorClassName="bg-blue-500"
           />
         </CardContent>
       </Card>
@@ -84,6 +85,7 @@ export function NutritionOverview({ meals }: { meals: Meal[] }) {
           <Progress
             value={(totals.carbs / targets.carbs) * 100}
             className="mt-2 h-2 bg-secondary"
+            indicatorClassName="bg-green-500"
           />
         </CardContent>
       </Card>
@@ -98,6 +100,7 @@ export function NutritionOverview({ meals }: { meals: Meal[] }) {
           <Progress
             value={(totals.fat / targets.fat) * 100}
             className="mt-2 h-2 bg-secondary"
+            indicatorClassName="bg-yellow-500"
           />
         </CardContent>
       </Card>

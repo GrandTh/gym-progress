@@ -12,7 +12,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
-import { createBrowserClient } from "@/lib/client"
+import { createBrowserClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useLanguage } from "@/lib/language-context"
 

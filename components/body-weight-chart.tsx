@@ -4,14 +4,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts"
 import { useEffect, useState } from "react"
-import { createClient } from "@/lib/client"
+import { createClient } from "@/lib/supabase/client"
 
 interface BodyWeightChartProps {
   userId: string
 }
 
 export function BodyWeightChart({ userId }: BodyWeightChartProps) {
-  const [data, setData] = useState<unknown[]>([])
+  const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

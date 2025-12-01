@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/server"
+import { createClient } from "@/lib/supabase/server"
 import { NutritionOverview } from "@/components/nutrition-overview"
 import { MealLogger } from "@/components/meal-logger"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"

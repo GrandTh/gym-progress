@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Play, Apple, Dumbbell, Scale } from "lucide-react"
-import { createClient } from "@/lib/server"
+import { createClient } from "@/lib/supabase/server"
 import { StrengthProgressionChart } from "@/components/strength-progression-chart"
 import { WorkoutFrequencyChart } from "@/components/workout-frequency-chart"
 
