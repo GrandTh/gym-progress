@@ -34,7 +34,8 @@ export default async function WorkoutsPage() {
     .order("created_at", { ascending: false })
 
   let assignedRoutines: any[] = []
-  if (profile?.role === "student" && user) {
+
+  if (user && profile?.role === "student") {
     // Get directly assigned routines
     const { data: directAssignments } = await supabase
       .from("routine_assignments")
@@ -65,9 +66,19 @@ export default async function WorkoutsPage() {
     } else {
       assignedRoutines = directAssignments || []
     }
+
+    // Filter out any null routines and deduplicate by routine id
+    const seenRoutineIds = new Set<string>()
+    assignedRoutines = assignedRoutines.filter((assignment) => {
+      if (!assignment.routine || seenRoutineIds.has(assignment.routine.id)) {
+        return false
+      }
+      seenRoutineIds.add(assignment.routine.id)
+      return true
+    })
   }
 
-  const isStudent = profile?.role === "student"
+  const hasAssignedRoutines = assignedRoutines.length > 0
 
   return (
     <div className="flex flex-col gap-6">
@@ -84,7 +95,7 @@ export default async function WorkoutsPage() {
         </Button>
       </div>
 
-      {isStudent && assignedRoutines.length > 0 && (
+      {hasAssignedRoutines && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <UserCheck className="h-5 w-5 text-blue-500" />
@@ -131,7 +142,7 @@ export default async function WorkoutsPage() {
 
       {/* Personal Routines Section */}
       <div className="space-y-4">
-        {isStudent && <h2 className="text-xl font-semibold">My Personal Routines</h2>}
+        {hasAssignedRoutines && <h2 className="text-xl font-semibold">My Personal Routines</h2>}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {/* New Routine Card */}
           <Link href="/dashboard/workouts/new" className="group">
