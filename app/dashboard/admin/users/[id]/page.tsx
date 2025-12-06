@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, use } from "react"
 import { useRouter } from "next/navigation"
 import { createBrowserClient } from "@/lib/supabase/client"
 import { useUser } from "@/lib/user-context"
@@ -50,8 +50,8 @@ interface UserGroup {
   coach_name: string | null
 }
 
-export default function AdminUserProfilePage({ params }: { params: { id: string } }) {
-  const { id: userId } = params
+export default function AdminUserProfilePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: userId } = use(params)
   const router = useRouter()
   const { profile, loading: profileLoading } = useUser()
   const { t } = useLanguage()

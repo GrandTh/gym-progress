@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Loader2, Plus, Users, Trash2, MoreVertical, ChevronRight } from "lucide-react"
+import { Loader2, Plus, Users, Trash2, MoreVertical, ChevronRight, Calendar, UserCircle } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
@@ -31,6 +31,8 @@ interface Group {
   name: string
   description: string | null
   created_at: string
+  coach_id: string
+  coach_profile: { first_name: string | null; last_name: string | null; email: string | null } | null
   members: {
     id: string
     student_id: string
@@ -56,26 +58,32 @@ export default function CoachGroupsPage() {
   const [groupDescription, setGroupDescription] = useState("")
   const [saving, setSaving] = useState(false)
 
+  const isAdmin = profile?.role === "admin"
+
   const fetchData = async () => {
     if (!profile) return
     setLoading(true)
 
     try {
-      // Fetch groups with members
-      const { data: groupsData } = await supabase
+      let query = supabase
         .from("coach_groups")
         .select(`
           *,
+          coach_profile:profiles!coach_groups_coach_id_fkey(first_name, last_name, email),
           members:group_members(
             id,
             student_id,
             profile:profiles!group_members_student_profile_fk(first_name, last_name, email)
           )
         `)
-        .eq("coach_id", profile.id)
         .order("created_at", { ascending: false })
 
-      // Fetch routine counts for each group
+      if (!isAdmin) {
+        query = query.eq("coach_id", profile.id)
+      }
+
+      const { data: groupsData } = await query
+
       if (groupsData) {
         const groupsWithRoutineCounts = await Promise.all(
           groupsData.map(async (group) => {
@@ -164,6 +172,23 @@ export default function CoachGroupsPage() {
     }
   }
 
+  const getCoachName = (group: Group) => {
+    if (!group.coach_profile) return "Inconnu"
+    const { first_name, last_name, email } = group.coach_profile
+    if (first_name || last_name) {
+      return `${first_name || ""} ${last_name || ""}`.trim()
+    }
+    return email || "Inconnu"
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    })
+  }
+
   if (loading) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
@@ -186,62 +211,68 @@ export default function CoachGroupsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t("groups")}</h1>
-          <p className="text-muted-foreground">Organisez vos élèves en groupes</p>
+          <p className="text-muted-foreground">
+            {isAdmin ? "Tous les groupes de la plateforme" : "Organisez vos élèves en groupes"}
+          </p>
         </div>
-        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              {t("createGroup")}
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{t("createGroup")}</DialogTitle>
-              <DialogDescription>Créez un nouveau groupe pour organiser vos élèves.</DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="groupName">{t("groupName")}</Label>
-                <Input
-                  id="groupName"
-                  placeholder="ex: Groupe du matin"
-                  value={groupName}
-                  onChange={(e) => setGroupName(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="groupDescription">{t("groupDescription")}</Label>
-                <Textarea
-                  id="groupDescription"
-                  placeholder="Description optionnelle..."
-                  value={groupDescription}
-                  onChange={(e) => setGroupDescription(e.target.value)}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
-                {t("cancel")}
-              </Button>
-              <Button onClick={handleCreateGroup} disabled={saving || !groupName.trim()}>
-                {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {!isAdmin && (
+          <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
                 {t("createGroup")}
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{t("createGroup")}</DialogTitle>
+                <DialogDescription>Créez un nouveau groupe pour organiser vos élèves.</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="groupName">{t("groupName")}</Label>
+                  <Input
+                    id="groupName"
+                    placeholder="ex: Groupe du matin"
+                    value={groupName}
+                    onChange={(e) => setGroupName(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="groupDescription">{t("groupDescription")}</Label>
+                  <Textarea
+                    id="groupDescription"
+                    placeholder="Description optionnelle..."
+                    value={groupDescription}
+                    onChange={(e) => setGroupDescription(e.target.value)}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
+                  {t("cancel")}
+                </Button>
+                <Button onClick={handleCreateGroup} disabled={saving || !groupName.trim()}>
+                  {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {t("createGroup")}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       {groups.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Users className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">{t("noGroups")}</p>
-            <Button className="mt-4" onClick={() => setCreateDialogOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              {t("createGroup")}
-            </Button>
+            <p className="text-muted-foreground">{isAdmin ? "Aucun groupe sur la plateforme" : t("noGroups")}</p>
+            {!isAdmin && (
+              <Button className="mt-4" onClick={() => setCreateDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                {t("createGroup")}
+              </Button>
+            )}
           </CardContent>
         </Card>
       ) : (
@@ -257,23 +288,36 @@ export default function CoachGroupsPage() {
                         <CardDescription className="line-clamp-2">{group.description}</CardDescription>
                       )}
                     </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem className="text-destructive" onClick={(e) => handleDeleteGroup(e, group.id)}>
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Supprimer le groupe
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    {(isAdmin || group.coach_id === profile?.id) && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={(e) => handleDeleteGroup(e, group.id)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Supprimer le groupe
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
+                <CardContent className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <UserCircle className="h-4 w-4" />
+                    <span>Créé par {getCoachName(group)}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4" />
+                    <span>le {formatDate(group.created_at)}</span>
+                  </div>
+                  <div className="flex items-center justify-between pt-2">
                     <div className="flex gap-2">
                       <Badge variant="secondary">
                         <Users className="mr-1 h-3 w-3" />
