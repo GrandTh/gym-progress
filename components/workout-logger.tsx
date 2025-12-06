@@ -43,18 +43,20 @@ export function WorkoutLogger({ routine }: { routine: any }) {
   // Initialize workout state from routine
   useEffect(() => {
     if (routine && routine.routine_exercises) {
-      const initialExercises = routine.routine_exercises.map((re: any) => ({
-        exercise_id: re.exercise_id,
-        name: re.exercises.name,
-        sets: Array.from({ length: re.target_sets || 3 }).map((_, i) => ({
-          set_number: i + 1,
-          reps: re.target_reps || 0,
-          weight: re.target_weight || 0,
-          completed: false,
-        })),
-        notes: re.notes || "",
-        superset_id: re.superset_id,
-      }))
+      const initialExercises = routine.routine_exercises
+        .filter((re: any) => re.exercises !== null)
+        .map((re: any) => ({
+          exercise_id: re.exercise_id,
+          name: re.exercises?.name || "Unknown Exercise",
+          sets: Array.from({ length: re.target_sets || 3 }).map((_, i) => ({
+            set_number: i + 1,
+            reps: re.target_reps || 0,
+            weight: re.target_weight || 0,
+            completed: false,
+          })),
+          notes: re.notes || "",
+          superset_id: re.superset_id,
+        }))
       setExercises(initialExercises)
     }
   }, [routine])

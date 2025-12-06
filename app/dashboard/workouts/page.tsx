@@ -39,64 +39,46 @@ export default async function WorkoutsPage() {
   let assignedRoutines: any[] = []
 
   if (user && profile?.role === "student") {
-    const { data: groupMemberships, error: gmError } = await supabase
-      .from("group_members")
-      .select("group_id")
-      .eq("student_id", user.id)
+    // Get group memberships first
+    const { data: groupMemberships } = await supabase.from("group_members").select("group_id").eq("student_id", user.id)
 
-    console.log("[v0] Group memberships:", groupMemberships)
-    console.log("[v0] Group memberships error:", gmError)
-
-    // Get directly assigned routines
-    const { data: directAssignments, error: directError } = await supabase
+    // Get directly assigned routines (without profiles join)
+    const { data: directAssignments } = await supabase
       .from("routine_assignments")
       .select(`
         id,
         notes,
-        routine:routines(*, routine_exercises(count)),
-        assigned_by_profile:profiles!routine_assignments_assigned_by_fkey(first_name, last_name, email)
+        routine:routines(*, routine_exercises(count))
       `)
       .eq("student_id", user.id)
 
-    console.log("[v0] Direct assignments:", directAssignments)
-    console.log("[v0] Direct assignments error:", directError)
-
     if (groupMemberships && groupMemberships.length > 0) {
       const groupIds = groupMemberships.map((gm) => gm.group_id)
-      console.log("[v0] Group IDs:", groupIds)
 
-      const { data: groupAssignments, error: groupError } = await supabase
+      // Get group assigned routines (without profiles join)
+      const { data: groupAssignments } = await supabase
         .from("routine_assignments")
         .select(`
           id,
           notes,
-          routine:routines(*, routine_exercises(count)),
-          assigned_by_profile:profiles!routine_assignments_assigned_by_fkey(first_name, last_name, email)
+          routine:routines(*, routine_exercises(count))
         `)
         .in("group_id", groupIds)
-
-      console.log("[v0] Group assignments:", groupAssignments)
-      console.log("[v0] Group assignments error:", groupError)
 
       assignedRoutines = [...(directAssignments || []), ...(groupAssignments || [])]
     } else {
       assignedRoutines = directAssignments || []
     }
 
-    console.log("[v0] Total assigned routines before filter:", assignedRoutines.length)
-
     // Filter out any null routines and deduplicate by routine id
     const seenRoutineIds = new Set<string>()
     assignedRoutines = assignedRoutines.filter((assignment) => {
-      console.log("[v0] Assignment routine:", assignment.routine)
       if (!assignment.routine || seenRoutineIds.has(assignment.routine.id)) {
         return false
       }
       seenRoutineIds.add(assignment.routine.id)
       return true
     })
-
-    console.log("[v0] Final assigned routines:", assignedRoutines.length)
   }
 
   const hasAssignedRoutines = assignedRoutines.length > 0
