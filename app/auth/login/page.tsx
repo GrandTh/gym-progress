@@ -19,12 +19,6 @@ export default function LoginPage() {
   const [envError, setEnvError] = useState(false)
   const router = useRouter()
 
-  // React.useEffect(() => {
-  //   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  //     setEnvError(true)
-  //   }
-  // }, [])
-
   const handleLogin = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
     const supabase = createClient()
@@ -53,8 +47,8 @@ export default function LoginPage() {
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Configuration Error</AlertTitle>
             <AlertDescription>
-              Supabase environment variables are missing. Please check your project settings or the &quot;Vars&quot; tab in the
-              sidebar.
+              Supabase environment variables are missing. Please check your project settings or the &quot;Vars&quot; tab
+              in the sidebar.
             </AlertDescription>
           </Alert>
         )}
@@ -78,7 +72,15 @@ export default function LoginPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="password">Password</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                    <Link
+                      href="/auth/forgot-password"
+                      className="text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
                   <Input
                     id="password"
                     type="password"

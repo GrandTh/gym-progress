@@ -6,7 +6,7 @@ export default function HomePage() {
   return (
     <div className="flex min-h-svh flex-col bg-gradient-to-b from-background to-muted/20">
       <header className="border-b">
-        <div className="container flex h-16 items-center justify-between px-4">
+        <div className="flex h-16 items-center justify-between px-6 md:px-12 lg:px-20">
           <div className="flex items-center gap-2">
             <Dumbbell className="h-6 w-6 text-primary" />
             <span className="font-bold text-xl">GymTracker</span>
@@ -23,9 +23,9 @@ export default function HomePage() {
       </header>
 
       <main className="flex-1">
-        <section className="container px-4 py-24 text-center">
-          <div className="mx-auto max-w-3xl">
-            <h1 className="mb-6 text-balance text-5xl font-bold tracking-tight lg:text-6xl">
+        <section className="px-6 md:px-12 lg:px-20 py-24 text-center">
+          <div className="mx-auto max-w-4xl">
+            <h1 className="mb-6 text-balance text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               Track Your Fitness Journey with Precision
             </h1>
             <p className="mb-8 text-pretty text-lg text-muted-foreground lg:text-xl">
@@ -43,8 +43,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="container px-4 py-16">
-          <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <section className="px-6 md:px-12 lg:px-20 py-16">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <div className="flex flex-col items-center gap-4 rounded-lg border bg-card p-6 text-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                 <Dumbbell className="h-6 w-6 text-primary" />
@@ -85,7 +85,7 @@ export default function HomePage() {
       </main>
 
       <footer className="border-t py-6">
-        <div className="container px-4 text-center text-sm text-muted-foreground">
+        <div className="px-6 md:px-12 lg:px-20 text-center text-sm text-muted-foreground">
           <p>GymTracker - Your Personal Fitness Companion</p>
         </div>
       </footer>
