@@ -147,7 +147,7 @@ export default function CoachGroupsPage() {
       setGroupName("")
       setGroupDescription("")
       setCreateDialogOpen(false)
-      fetchData()
+      await fetchData()
     } catch (error) {
       console.error("Error creating group:", error)
       toast({ title: "Erreur lors de la création du groupe", variant: "destructive" })
